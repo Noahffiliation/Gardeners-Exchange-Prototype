@@ -1,0 +1,10 @@
+-- CAUTION!! WILL REMOVE ALL DATA FROM DB. USE WITH CARE
+
+DELETE FROM message;
+DELETE FROM photo;
+DELETE FROM listing_tag;
+DELETE FROM tag;
+DELETE FROM account_favorites;
+DELETE FROM transaction;
+DELETE FROM listing;
+DELETE FROM account;
