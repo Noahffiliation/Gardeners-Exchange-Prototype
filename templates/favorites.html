@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorites{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-md-center">
+        <h1>Favorite Sellers</h1>
+    </div>
+
+    <div class="row" style="padding-top: 3%">
+        {% for row in favorites %}
+            <div style='padding: 5%'>
+                <a href="{{ url_for('find_account', email = row[1])}}"> {{ row[1] }}</a>
+            </div>
+        {% else %}
+            <div>No Favorites</div>
+        {% endfor %}
+    </div>
+{% endblock %}

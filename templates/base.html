@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=BioRhyme" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='basic.css') }}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <title>{% block title %}Title{% endblock %}</title>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-light justify-content-center">
+    <a class="navbar-brand" href="{{ url_for('index') }}" style="font-family: 'BioRhyme', 'serif'"> <p> Gardener's Exchange </p> </a>
+    <button class="navbar-toggler ml-1" type="button" data-toggle="collapse" data-target="#collapsingNavbar2">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse justify-content-between align-items-center w-100" id="collapsingNavbar2">
+        <ul>
+
+        </ul>
+        <ul class="navbar-nav navbar-right">
+            <li class="nav-item">
+                <a class="nav-link white-text" href="{{ url_for('render_feed') }}" style="color:white;">Buy</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('create_listing') }}">Sell</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link white-text" href="{{ url_for('render_message') }}" style="color:white;">Messages</a>
+            </li>
+            <li class="nav-item" style="display: none">
+                <a class="nav-link" href="#">Trade</a>
+            </li>
+            <li class="nav-item">
+                {% if not current_user.is_anonymous %}
+                    <a class="nav-link" href="{{ url_for('favorites', email = current_user.email) }}">Favorites</a>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('find_account', email = current_user.email)}}">{{ current_user.email }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                {% endif %}
+
+        </ul>
+    </div>
+</nav>
+
+<div id="container">
+    <div id="content" class="container shadow-lg bg-white">
+        <div id="page">
+            {% for message in get_flashed_messages() %}
+            <div class="alert alert-primary flash" style="margin-top: 3%;">{{ message }}</div>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <footer id="footer" style="padding-top: 40px;">
+        <div class="container footer">
+            <div class="row">
+                <div class="col-md-6 text-center">
+                    Gardener's Exchange
+                </div>
+                <div class="col-md-6 text-center">
+                    <a href="{{ url_for('about') }}"> About Us </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+    <h1 class="display-4">Test Functions</h1>
+    <ul>
+        <!-- Yay test links to everything -->
+        <li><a href="{{ url_for('all_listings') }}">Show All Listings</a></li>
+        <li><a href="{{ url_for('find_listing', id = 101) }}">Find Listing 1</a></li>
+        <li><a href="{{ url_for('find_listing', id = 102) }}">Find Listing 2</a></li>
+        <li><a href="{{ url_for('create_listing')}}">Create new listing</a></li>
+
+        <li><a href="{{ url_for('all_accounts') }}">Show All Accounts</a></li>
+        <li><a href="{{ url_for('find_account', email = 'santa@claus.com') }}">Find Account 3</a></li>
+        <li><a href="{{ url_for('find_account', email = 'matt@collins.com') }}">Find Account 13</a></li>
+        <li><a href="{{ url_for('create_account')}}">Create new account</a></li>
+    </ul>
+{% endblock %}
+

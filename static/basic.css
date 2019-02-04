@@ -1,0 +1,120 @@
+html,
+body{
+    font-family: 'Open Sans';
+    background-color: white;
+    color: black;
+    height: 100%;
+}
+
+.navbar{
+    background-color: #222629;
+    position: relative;
+    top: 0;
+    width: 100%;
+    z-index: 4;
+}
+
+.nav-item {
+    background-color: #61892f;
+    color: white;
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: 5px;
+    border-radius: 2px;
+    font-size: large;
+}
+
+.nav-link {
+    color: #CCCCCC !important;
+}
+
+.nav-link:hover {
+    color: white !important;
+}
+
+.listing-title {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+.listing-info {
+    font-size: medium;
+}
+
+.modal-header {
+    height: 0;
+    border-bottom: none;
+    margin-bottom: -20px;
+}
+
+
+#loginbutton {
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: 5px;
+    border-radius: 3px;
+    font-size: small;
+
+}
+
+
+.container{
+    width: 50%;
+    clear: both;
+}
+
+.listing {
+    border: solid 1px lightgrey;
+}
+
+p {
+    font-family: "Open Sans";
+    font-size: 20px;
+    color: black;
+}
+
+.map {
+    height: 150px;
+    width: 75%;
+}
+
+#container {
+    position: relative;
+    height: auto !important;
+    min-height: 100%;
+    background-image: url("/static/vegetables_blurred.jpg");
+    padding-top: 10px;
+    padding-bottom: 5%;
+}
+
+
+#page {
+    position: relative;
+    padding: 2% 2% 4% 2%;
+    margin-bottom: 80px;
+}
+
+#flash {
+    position: relative;
+}
+
+#footer {
+    position: absolute;
+    width: 100%;
+    background: #474B4F;
+    color: #6B6E70;
+    margin-top: 50px;
+    padding-bottom:3%;
+    bottom: 0;
+    left: 0;
+}
+
+.footer a {
+    color: #6B6E70;
+}
+
+.footer a:hover {
+    color: darkgrey;
+
+}
+
