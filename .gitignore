@@ -4,3 +4,5 @@ db_config.py
 venv/
 *.xml
 __pycache__/
+doc/*.pptx
+doc/*.docx
