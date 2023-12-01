@@ -70,7 +70,7 @@ class ApplicationTestCase(FlaskTestCase):
         self.assertTrue(login_user(account))
 
         resp = self.client.get(url_for('create_account'))
-        self.assertTrue(b'Create a new account' in resp.data)
+        self.assertIn(b'Create a new account', resp.data)
 
     # update_account
     def test_update_account(self):
@@ -78,20 +78,20 @@ class ApplicationTestCase(FlaskTestCase):
         db.update_account('test@example.com', 'Second', 'Third', 'A basic biography', 'password')
 
         resp = self.client.get(url_for('update_account', email='test@example.com'))
-        self.assertTrue(b'Update account' in resp.data)
+        self.assertIn(b'Update account', resp.data)
 
         resp = self.client.get(url_for('find_account', email='test@example.com'))
-        self.assertTrue(b'A basic biography' in resp.data)
+        self.assertIn(b'A basic biography', resp.data)
 
     # create_listing
     def test_create_listing(self):
         login_test_user()
         db.create_listing('test', 5, 'junk text', 10, 'test@example.com', 'pc')
         resp = self.client.get(url_for('render_feed'))
-        self.assertTrue(b'test' in resp.data)
+        self.assertIn(b'test', resp.data)
 
         resp = self.client.get(url_for('create_listing'), follow_redirects=True)
-        self.assertTrue(b'Log In' in resp.data)
+        self.assertIn(b'Log In', resp.data)
 
     # render_feed
     def test_render_feed(self):
@@ -104,10 +104,10 @@ class ApplicationTestCase(FlaskTestCase):
         db.create_listing('Apples', 5, 'Some form of description', 5, 'test2@example.com', 'grams')
 
         resp = self.client.get(url_for('render_feed'))
-        self.assertTrue(b'Potatoes' in resp.data)
-        self.assertTrue(b'Tomatoes' in resp.data)
-        self.assertTrue(b'Bananas' in resp.data)
-        self.assertTrue(b'Apples' in resp.data)
+        self.assertIn(b'Potatoes', resp.data)
+        self.assertIn(b'Tomatoes', resp.data)
+        self.assertIn(b'Bananas', resp.data)
+        self.assertIn(b'Apples', resp.data)
 
 
 class DatabaseTestCase(FlaskTestCase):
