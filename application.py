@@ -11,7 +11,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 import db
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'Bagel Boiz Bun Roasting Bonanza'
 
 
 @app.before_request
