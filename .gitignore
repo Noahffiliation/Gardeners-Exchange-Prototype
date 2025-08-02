@@ -1,8 +1,9 @@
 db_config.py
 ./static/photos/*
 .idea/
-venv/
+.venv/
 *.xml
 __pycache__/
 doc/*.pptx
 doc/*.docx
+.vscode

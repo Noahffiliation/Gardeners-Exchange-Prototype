@@ -3,8 +3,8 @@ from pathlib import PurePath
 
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired
-from wtforms import StringField, SubmitField, SelectField, FloatField, PasswordField, ValidationError, TextAreaField, IntegerField
+from flask_wtf.file import FileField
+from wtforms import StringField, SubmitField, SelectField, FloatField, PasswordField, TextAreaField, IntegerField
 from wtforms.validators import Email, Length, DataRequired, NumberRange, InputRequired, EqualTo, Optional
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, AnonymousUserMixin
 
