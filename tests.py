@@ -1,5 +1,12 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import sys
+
+# Mock db_config before db is imported to prevent checks for real credentials or missing file
+mock_db_config = MagicMock()
+mock_db_config.data_source_name = "dbname=test user=mock password=mock host=localhost"
+sys.modules['db_config'] = mock_db_config
+
 import db
 from application import app, Account
 from flask import g

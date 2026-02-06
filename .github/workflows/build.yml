@@ -21,6 +21,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run Tests with Coverage
         run: |
+          echo "data_source_name = 'host=localhost dbname=test user=test password=test'" > db_config.py
           pytest --cov=. --cov-report=xml:coverage.xml tests.py
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7
