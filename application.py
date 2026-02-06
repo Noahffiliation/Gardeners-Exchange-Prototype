@@ -234,7 +234,7 @@ def create_listing():
                                            current_user.email,
                                            listing_form.unit.data)
 
-            if listing_id is not 0:
+            if listing_id != 0:
                 if listing_form.photo.data is not None:
                     uploaded_photo = listing_form.photo.data
 
@@ -314,12 +314,12 @@ def update_listing(id):
 @app.route('/feed/buy/<listing_id>/<amount>', methods=['POST'])
 @login_required
 def buy_listing(listing_id, amount):
-    if amount <= db.find_listing(listing_id)['quantity']:
-        rowcount = db.buy_listing(listing_id, amount)
-        flash("You bought {} {} of {}".format('amount', db.find_listing(listing_id)['unit'], db.find_listing(listing_id)['name']))
+    if float(amount) <= db.find_listing(listing_id)['quantity']:
+        rowcount = db.buy_listing(listing_id, float(amount))
+        flash("You bought {} {} of {}".format(amount, db.find_listing(listing_id)['unit'], db.find_listing(listing_id)['name']))
     else:
         flash('Invalid amount')
-    return render_template(url_for('render_feed'))
+    return redirect(url_for('render_feed'))
 
 
 # Render 'feed' as homepage
@@ -328,7 +328,7 @@ def render_feed():
     buy_form = BuyForm()
     if buy_form.validate_on_submit():
         print("IM TRYING")
-        return render_template(url_for('buy_listing', listing_id=buy_form.id.data, amount=buy_form.amount.data))
+        return redirect(url_for('buy_listing', listing_id=buy_form.id.data, amount=buy_form.amount.data))
     db.check_expire_all()
     num_items = 100
     if current_user:

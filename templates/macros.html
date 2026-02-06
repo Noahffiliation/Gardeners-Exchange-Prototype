@@ -96,8 +96,7 @@
         var map = [];
         var i = 0;
         {% for listing in listings %}
-        var listing_id = {{ listing.id }
-    };
+        var listing_id = {{ listing.id }};
     var mapId = ('map' + listing_id);
     map[i] = (new google.maps.Map(document.getElementById(mapId), {
         zoom: 14,
