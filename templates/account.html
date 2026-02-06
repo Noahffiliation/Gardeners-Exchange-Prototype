@@ -1,147 +1,58 @@
 {% extends 'base.html' %}
+{% from 'macros.html' import render_listing, init_map_script %}
 
 {% block title %}Account{% endblock %}
 
 {% block content %}
-    <br>
-    <br>
-    <br>
-    <div class="row" style="padding: 3%; background-color: gainsboro; border-radius:3px;">
-        <div class="col col-md-3">
-            <div class="row">
-                <img src="https://source.unsplash.com/user/jampatcon/500x600" width="100%" height="100%">
-            </div>
-            <div class="row" style = "padding-top:10px">
-                {% if current_user.email == account.email %}
-                    <a href="{{ url_for('update_account', email = current_user.email) }}" class="btn btn-light btn-md active" role="button" aria-pressed="true">Edit account</a>
-                {% else %}
-                    <!--<a href="{{ url_for('mark_favorite') }}" class="btn btn-light btn-md active" role="button" aria-pressed="true">Favorite</a>-->
-                    <button id="favorite_button">Favorite</button>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="col-md-1"></div>
-        <div class="col-md-8">
-            <h2>Name</h2>{{ account.first_name }} {{ account.last_name }}
-            <br><br>
-            <h2>Email</h2>{{ account.email }}
-            <br><br>
-            <h2>About Me</h2>{{ account.bio }}
-        </div>
-
-
-    </div>
-    <div style="padding-top: 3%">
+<br>
+<br>
+<br>
+<div class="row" style="padding: 3%; background-color: gainsboro; border-radius:3px;">
+    <div class="col col-md-3">
         <div class="row">
-            <h3>{{ account.first_name }}'s listings</h3>
+            <img src="https://source.unsplash.com/user/jampatcon/500x600" width="100%" height="100%">
         </div>
-        <div class="row">
-            {%- for row in listings| batch(4) %}
-                {%- for listing in row %}
-                    <div class="col-md-3">
-                        <div style='padding: 5%'>
-                            <button type="button" class="btn btn-light listing" data-toggle="modal" data-target="#{{ listing.id }}" style="width:100%">
-                                {% if listing.file_path != 'bogus_path' %}
-                                    <img src="{{ listing.file_path }}" width="100%">
-                                {% else %}
-                                    <img src="https://source.unsplash.com/user/jampatcon/1000x1000" width="100%">
-                                {% endif %}
-                                <br>
-                                <div class="listing-title">{{ listing.name }}</div>
-                                <div class="listing-info">${{ listing.price }}/{{ listing.unit }}</div>
-                                <div class="listing-info">{{ listing.time_posted.strftime('%b %d - %I:%M %p')}}</div>
-                            </button>
-                        </div>
-
-                        <div class="modal fade" id="{{ listing.id }}">
-                            <div class="modal-dialog-centered modal-lg modal-dialog">
-                                <div class="modal-content">
-                                    <!-- Modal body -->
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="container-fluid d-flex justify-content-end align-items-start">
-                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            </div>
-                                            <div class="col-md-5">
-                                                {% if listing.file_path != 'bogus_path' %}
-                                                    <img src="{{ listing.file_path }}" width="100%">
-                                                {% else %}
-                                                    <img src="https://source.unsplash.com/user/jampatcon/1000x1000" width="100%">
-                                                {% endif %}
-                                            </div>
-                                            <div class="col-md-7 ml-auto">
-                                                <div class="row"  style="padding-bottom: 20px">
-                                                    <div class="col-md-12">
-                                                        <h1>{{ listing.name }}</h1>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <h3>Quantity: {{ listing.quantity }} {{ listing.unit }}s</h3>
-                                                </div>
-                                                <div class="row">
-                                                    <h3>Price: ${{ listing.price }}/{{ listing.unit }}</h3><br>
-                                                </div>
-                                                <div class="row">
-                                                    Description: {{ listing.description }}
-                                                </div>
-                                                <style>
-                                                    #map {
-                                                        height: 150px;
-                                                        width: 75%;
-                                                    }
-                                                </style>
-                                                <div id="map{{ listing.id }}" class="map" style="margin-bottom: 10px"></div>
-
-                                            </div>
-                                            <div class="container-fluid d-flex justify-content-end align-items-end" >
-                                                {% if current_user.email == account.email %}
-                                                    <a href="{{ url_for('update_listing', id = listing.id) }}" class="btn btn-light btn-md active" role="button" aria-pressed="true">Edit listing</a>
-                                                    <button type="button" class="btn btn-warning" style="margin-left: 10px">Remove Listing</button>
-                                                {% else %}
-                                                    <button type="button" class="btn btn-light">Buy!</button>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {%- endfor %}
-            {% else%}
-                <div> No Listings Found </div>
-            {%- endfor %}
+        <div class="row" style="padding-top:10px">
+            {% if current_user.email == account.email %}
+            <a href="{{ url_for('update_account', email = current_user.email) }}" class="btn btn-light btn-md active"
+                role="button" aria-pressed="true">Edit account</a>
+            {% else %}
+            <!--<a href="{{ url_for('mark_favorite') }}" class="btn btn-light btn-md active" role="button" aria-pressed="true">Favorite</a>-->
+            <button id="favorite_button">Favorite</button>
+            {% endif %}
         </div>
     </div>
-    <script>
-        function initMap() {
-            var uluru = {lat: 40.459059, lng: -85.498033};
-            var map = [];
-            var i = 0;
-            {% for listing in listings %}
-                var listing_id = {{ listing.id }};
-                var mapId = ('map'+ listing_id);
-                //document.getElementById(mapId).style.height = "500px";
-                map[i] = ( new google.maps.Map(document.getElementById(mapId), {
-                    zoom: 14,
-                    center: uluru
-                }));
-                var marker = new google.maps.Marker({
-                    position: uluru,
-                    map: map[i]
-                });
-                i++;
-            {% endfor %}
-        }
-    </script>
-    <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key={GOOGLE_API_KEY}&callback=initMap">
-    </script>
-    <script>
-        $('#favorite_button').click(function () {
-            $.post("{{ url_for('mark_favorite') }}", {favorite_email: "{{ account.email }}"});
-            window.location.href = "{{ url_for('favorites', email = current_user.email) }}";
-        });
-    </script>
+
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        <h2>Name</h2>{{ account.first_name }} {{ account.last_name }}
+        <br><br>
+        <h2>Email</h2>{{ account.email }}
+        <br><br>
+        <h2>About Me</h2>{{ account.bio }}
+    </div>
+
+
+</div>
+<div style="padding-top: 3%">
+    <div class="row">
+        <h3>{{ account.first_name }}'s listings</h3>
+    </div>
+    <div class="row">
+        {%- for row in listings| batch(4) %}
+        {%- for listing in row %}
+        {{ render_listing(listing, current_user, account=account) }}
+        {%- endfor %}
+        {% else%}
+        <div> No Listings Found </div>
+        {%- endfor %}
+    </div>
+</div>
+{{ init_map_script(listings) }}
+<script>
+    $('#favorite_button').click(function () {
+        $.post("{{ url_for('mark_favorite') }}", { favorite_email: "{{ account.email }}" });
+        globalThis.location.href = "{{ url_for('favorites', email = current_user.email) }}";
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,116 @@
+{% macro render_listing(listing, current_user, account=None, is_feed=False, form=None) %}
+<div class="col-md-3">
+    <div style='padding: 5%'>
+        <button type="button" class="btn btn-light listing" data-toggle="modal" data-target="#{{ listing.id }}"
+            style="width:100%">
+            {% if listing.file_path != 'bogus_path' %}
+            <img src="{{ listing.file_path }}" width="100%" alt="{{ listing.name }}">
+            {% else %}
+            <img src="https://source.unsplash.com/user/jampatcon/1000x1000" width="100%" alt="Placeholder">
+            {% endif %}
+            <br>
+            <div class="listing-title">{{ listing.name }}</div>
+            <div class="listing-info">${{ listing.price }}/{{ listing.unit }}</div>
+            <div class="listing-info">{{ listing.time_posted.strftime('%b %d - %I:%M %p')}}</div>
+        </button>
+    </div>
+
+    <div class="modal fade" id="{{ listing.id }}">
+        <div class="modal-dialog-centered modal-lg modal-dialog">
+            <div class="modal-content">
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="container-fluid d-flex justify-content-end align-items-start">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="col-md-5">
+                            {% if listing.file_path != 'bogus_path' %}
+                            <img src="{{ listing.file_path }}" width="100%" alt="{{ listing.name }}">
+                            {% else %}
+                            <img src="https://source.unsplash.com/user/jampatcon/1000x1000" width="100%"
+                                alt="Placeholder">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-7 ml-auto">
+                            <div class="row" style="padding-bottom: 20px">
+                                <div class="col-md-12">
+                                    <h1>{{ listing.name }}</h1>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <h3>Quantity: {{ listing.quantity }} {{ listing.unit }}s</h3>
+                            </div>
+                            <div class="row">
+                                <h3>Price: ${{ listing.price }}/{{ listing.unit }}</h3><br>
+                            </div>
+                            <div class="row">
+                                Description: {{ listing.description }}
+                            </div>
+                            {% if is_feed %}
+                            <div class="row">
+                                Posted by:&nbsp<a href="{{ url_for('find_account', email = listing.account_email)}}"> {{
+                                    listing.account_email }}</a>
+                            </div>
+                            {% endif %}
+                            <style>
+                                #map {
+                                    height: 150px;
+                                    width: 75%;
+                                }
+                            </style>
+                            <div id="map{{ listing.id }}" class="map" style="margin-bottom: 10px">{% if is_feed %}map{{
+                                listing.id }}{% endif %}</div>
+                        </div>
+                        <div class="container-fluid d-flex justify-content-end align-items-end">
+                            {% if is_feed and form %}
+                            <div style="width:40%"> {{ form.amount(class_="form-control") }} </div>
+                            <div style="display: none">{{ form.id(value=listing.id) }}</div>
+                            {{ form.buy(class_="btn btn-light") }}
+                            {% elif account %}
+                            {% if current_user.email == account.email %}
+                            <button type="button" class="btn btn-light btn-md"
+                                onclick="window.location.href='{{ url_for('update_listing', id = listing.id) }}'">Edit
+                                listing</button>
+                            <button type="button" class="btn btn-warning" style="margin-left: 10px">Remove
+                                Listing</button>
+                            {% else %}
+                            <button type="button" class="btn btn-light">Buy!</button>
+                            {% endif %}
+                            {% else %}
+                            <button type="button" class="btn btn-light">Buy!</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro init_map_script(listings) %}
+<script>
+    function initMap() {
+        var uluru = { lat: 40.459059, lng: -85.498033 };
+        var map = [];
+        var i = 0;
+        {% for listing in listings %}
+        var listing_id = {{ listing.id }
+    };
+    var mapId = ('map' + listing_id);
+    map[i] = (new google.maps.Map(document.getElementById(mapId), {
+        zoom: 14,
+        center: uluru
+    }));
+    var marker = new google.maps.Marker({
+        position: uluru,
+        map: map[i]
+    });
+    i++;
+    {% endfor %}
+        }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={GOOGLE_API_KEY}&callback=initMap">
+</script>
+{% endmacro %}
