@@ -85,7 +85,7 @@ def login():
     return render_template('login.html', form=form, hacker_news=db.all_accounts())
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()
@@ -94,30 +94,30 @@ def logout():
 
 
 # Routes site to Main index page
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return redirect(url_for('render_feed'))
 
 
 # Routes to a testing page
-@app.route('/testing')
+@app.route('/testing', methods=['GET'])
 def testing():
     return render_template('testing.html')
 
 
-@app.route('/all_accounts')
+@app.route('/all_accounts', methods=['GET'])
 def all_accounts():
     # print(db.all_accounts())
     return render_template('all-accounts.html', accounts=db.all_accounts())
 
 
-@app.route('/about')
+@app.route('/about', methods=['GET'])
 def about():
     # print(db.all_accounts())
     return render_template('about.html', accounts=db.all_accounts())
 
 
-@app.route('/find_account/<email>')
+@app.route('/find_account/<email>', methods=['GET'])
 def find_account(email):
     account = db.find_account(email)
 
@@ -323,7 +323,7 @@ def buy_listing(listing_id, amount):
 
 
 # Render 'feed' as homepage
-@app.route('/feed')
+@app.route('/feed', methods=['GET'])
 def render_feed():
     buy_form = BuyForm()
     if buy_form.validate_on_submit():
@@ -338,7 +338,7 @@ def render_feed():
 
 
 # View Message
-@app.route('/view_message')
+@app.route('/view_message', methods=['GET'])
 def render_message():
 
     messages = db.fetch_messages(me, you)
@@ -351,7 +351,7 @@ def mark_favorite():
     return "OK"
 
 
-@app.route('/favorites/<email>')
+@app.route('/favorites/<email>', methods=['GET'])
 @login_required
 def favorites(email):
     account = db.find_account(email)
