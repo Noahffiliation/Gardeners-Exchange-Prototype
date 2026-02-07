@@ -1,12 +1,12 @@
 html,
-body{
-    font-family: 'Open Sans';
+body {
+    font-family: 'Open Sans', sans-serif;
     background-color: white;
     color: black;
     height: 100%;
 }
 
-.navbar{
+.navbar {
     background-color: #222629;
     position: relative;
     top: 0;
@@ -61,7 +61,7 @@ body{
 }
 
 
-.container{
+.container {
     width: 50%;
     clear: both;
 }
@@ -71,7 +71,7 @@ body{
 }
 
 p {
-    font-family: "Open Sans";
+    font-family: "Open Sans", sans-serif;
     font-size: 20px;
     color: black;
 }
@@ -107,7 +107,7 @@ p {
     background: #474B4F;
     color: #FFFFFF;
     margin-top: 50px;
-    padding-bottom:3%;
+    padding-bottom: 3%;
     bottom: 0;
     left: 0;
 }
@@ -120,4 +120,3 @@ p {
     color: #DDDDDD;
 
 }
-
