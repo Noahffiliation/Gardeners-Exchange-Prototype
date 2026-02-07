@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 import sys
 import sqlite3
 import os
+import datetime
 
 # db_config is gone, no need to mock it.
 
@@ -351,6 +352,126 @@ class DatabaseTestCase(unittest.TestCase):
 
         # Verify
         self.assertEqual(path_row['file_path'], 'real.jpg')
+
+    def test_find_password(self):
+        db.create_account('test@test.com', 'U', 'N', 'pass')
+        pwd = db.find_password('test@test.com')
+        self.assertEqual(pwd['password'], 'pass')
+
+    def test_all_listings(self):
+        db.create_account('u@t.com', 'F', 'L', 'p')
+        db.create_listing('L1', 1, 'D', 1, 'u@t.com', 'u')
+        db.create_listing('L2', 1, 'D', 1, 'u@t.com', 'u')
+        listings = db.all_listings()
+        self.assertEqual(len(listings), 2)
+
+    def test_update_account(self):
+        db.create_account('u@t.com', 'F', 'L', 'p')
+        # Update with password
+        db.update_account('u@t.com', 'NewF', 'NewL', 'Bio', 'newpass')
+        acc = db.find_account('u@t.com')
+        self.assertEqual(acc['first_name'], 'NewF')
+        self.assertEqual(acc['password'], 'newpass')
+
+        # Update without password
+        db.update_account('u@t.com', 'NewF2', 'NewL2', 'Bio2', '')
+        acc = db.find_account('u@t.com')
+        self.assertEqual(acc['first_name'], 'NewF2')
+        self.assertEqual(acc['password'], 'newpass') # Should remain unchanged
+
+    def test_favorites(self):
+        db.create_account('a@t.com', 'A', 'A', 'p')
+        db.create_account('b@t.com', 'B', 'B', 'p')
+        db.mark_favorite('a@t.com', 'b@t.com')
+        favs = db.list_favorites('a@t.com')
+        self.assertEqual(len(favs), 1)
+        self.assertEqual(favs[0]['favorites_email'], 'b@t.com')
+
+    def test_messages(self):
+        # We need to manually insert messages since there is no helper create_message function in db.py exposed (check schema)
+        # Schema: message (id, body, recipient, author, time, parent)
+        # Actually there IS NO create_message function in db.py? Let's check db.py again later.
+        # But fetch_messages exists.
+        # Let's insert manually using cursor for now to test fetch.
+        g.cursor.execute("INSERT INTO message (body, recipient, author, parent) VALUES ('Body', 'b@t.com', 'a@t.com', 1)")
+        g.connection.commit()
+        msgs = db.fetch_messages('a@t.com', 'b@t.com')
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(msgs[0]['body'], 'Body')
+
+    def test_id_helpers(self):
+        db.create_account('u@t.com', 'F', 'L', 'p')
+        lid = db.create_listing('Item', 1, 'D', 1, 'u@t.com', 'u')
+
+        uid = db.get_id_from_email('u@t.com')
+        self.assertIsNotNone(uid)
+
+        email = db.get_email_from_listing(lid)
+        self.assertEqual(email, 'u@t.com')
+
+    def test_photo_helpers(self):
+        db.create_account('u@t.com', 'F', 'L', 'p')
+        lid = db.create_listing('Item', 1, 'D', 1, 'u@t.com', 'u')
+
+        # Test add_listing_photo_path (updates listing table)
+        db.add_listing_photo_path(lid, 'test.jpg')
+        l = db.find_listing(lid)
+        self.assertEqual(l['file_path'], 'test.jpg')
+
+        # Test last_photo_seq (uses photo table)
+        # Need to insert a photo to test sequence logic if it relies on max(id)
+        db.init_listing_photo(lid)
+        seq = db.last_photo_seq()
+        self.assertTrue(seq > 0)
+
+    def test_expiration_logic(self):
+        db.create_account('u@t.com', 'F', 'L', 'p')
+
+        # Test 1: Not expired (posted now)
+        lid1 = db.create_listing('Fresh', 1, 'D', 1, 'u@t.com', 'u')
+        db.check_expire_listing(lid1)
+        l1 = db.find_listing(lid1)
+        self.assertEqual(l1['expired'], 0)
+
+        # Test 2: Expired (posted 11 days ago)
+        # We need to manually insert with old time because create_listing uses DEFAULT CURRENT_TIMESTAMP
+        # or we update it.
+        old_date = datetime.datetime.now() - datetime.timedelta(days=12)
+        # We need to insert directly to override default, or update.
+        # Update is easier but update_listing doesn't touch time_posted.
+        # Let's insert manually with a specific ID to track it.
+        g.cursor.execute('''INSERT INTO listing (name, quantity, description, price, unit, account_email, time_posted)
+                            VALUES ('Old', 1, 'D', 1, 'u', 'u@t.com', :time)''', {'time': old_date})
+        lid2 = g.cursor.lastrowid
+        g.connection.commit()
+
+        db.check_expire_listing(lid2)
+        l2 = db.find_listing(lid2)
+        self.assertEqual(l2['expired'], 1)
+
+        # Test 3: String date handling (simulate legacy data or SQLite string returns without converter)
+        # However, with converter registered, it usually comes back as datetime.
+        # Use a raw insert of a string to bypass adapter if possible?
+        # Or just trust the logic handles strings if they somehow exist.
+        # To force a string check in check_expire_listing, we might need to mock the row return
+        # but that tests the mock, not the DB logic.
+        # If we insert a string that DOESN'T match ISO, check_expire_listing returns early.
+        g.cursor.execute("INSERT INTO listing (name, quantity, description, price, unit, account_email, time_posted) VALUES ('BadDate', 1, 'D', 1, 'u', 'u@t.com', 'not-a-date')")
+        lid3 = g.cursor.lastrowid
+        g.connection.commit()
+
+        db.check_expire_listing(lid3)
+        l3 = db.find_listing(lid3)
+        self.assertEqual(l3['expired'], 0) # Should not explode, just return
+
+        # Test 4: check_expire_all
+        # Reset lid2 to not expired manually to test check_expire_all
+        g.cursor.execute("UPDATE listing SET expired = 0 WHERE id = :id", {'id': lid2})
+        g.connection.commit()
+
+        db.check_expire_all()
+        l2_again = db.find_listing(lid2)
+        self.assertEqual(l2_again['expired'], 1)
 
 if __name__ == '__main__':
     unittest.main()

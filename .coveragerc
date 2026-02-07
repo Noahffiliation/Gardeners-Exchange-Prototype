@@ -1,0 +1,6 @@
+[run]
+omit =
+    tests.py
+    init_db_sqlite.py
+    */site-packages/*
+    */dist-packages/*

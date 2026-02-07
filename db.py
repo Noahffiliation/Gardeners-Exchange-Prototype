@@ -14,7 +14,10 @@ def adapt_datetime(val):
 
 def convert_timestamp(val):
     """Convert ISO 8601 string to datetime.datetime."""
-    return datetime.datetime.fromisoformat(val.decode())
+    try:
+        return datetime.datetime.fromisoformat(val.decode())
+    except ValueError:
+        return val.decode()
 
 
 sqlite3.register_adapter(datetime.datetime, adapt_datetime)
