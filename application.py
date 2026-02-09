@@ -3,6 +3,7 @@ from pathlib import PurePath
 
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
 from flask_wtf.file import FileField
 from wtforms import StringField, SubmitField, SelectField, FloatField, PasswordField, TextAreaField, IntegerField
 from wtforms.validators import Email, Length, DataRequired, NumberRange, InputRequired, EqualTo, Optional
@@ -11,6 +12,10 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 import db
 
 app = Flask(__name__)
+
+# Security: define secret key for session and CSRF protection
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+csrf = CSRFProtect(app)
 
 
 @app.before_request
@@ -315,7 +320,7 @@ def update_listing(id):
 @login_required
 def buy_listing(listing_id, amount):
     if float(amount) <= db.find_listing(listing_id)['quantity']:
-        rowcount = db.buy_listing(listing_id, float(amount))
+        db.buy_listing(listing_id, float(amount))
         flash("You bought {} {} of {}".format(amount, db.find_listing(listing_id)['unit'], db.find_listing(listing_id)['name']))
     else:
         flash('Invalid amount')

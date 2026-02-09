@@ -20,6 +20,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run Tests with Coverage
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           echo "data_source_name = 'host=localhost dbname=test user=test password=test'" > db_config.py
           pytest --cov=. --cov-report=xml:coverage.xml tests.py
