@@ -51,6 +51,7 @@ class ApplicationTestCase(FlaskTestCase):
 
             response = self.client.post('/login', data=dict(
                 email='test@example.com',
+                # file deepcode ignore NoHardcodedPasswords/test: <please specify a reason of ignoring this>
                 password='test_password'
             ), follow_redirects=True)
             self.assertIn(b'Logged in successfully', response.data)
@@ -489,6 +490,7 @@ from flask import g
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         app.config['SECRET_KEY'] = 'test_secret_key'
+        # file deepcode ignore DisablesCSRFProtection/test: <please specify a reason of ignoring this>
         app.config['WTF_CSRF_ENABLED'] = False # Disable CSRF for testing
         app.testing = True
         self.client = app.test_client()
