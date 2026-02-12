@@ -1,5 +1,6 @@
 import os
 from pathlib import PurePath
+from dotenv import load_dotenv
 
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
@@ -14,7 +15,10 @@ import db
 app = Flask(__name__)
 
 # Security: define secret key for session and CSRF protection
+load_dotenv()
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+if not app.config['SECRET_KEY']:
+    raise ValueError("No SECRET_KEY set for Flask application")
 csrf = CSRFProtect(app)
 
 

@@ -17,7 +17,7 @@ SCHEMA_FILE = os.path.join(os.path.dirname(__file__), 'db', 'schema.sql')
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         app.config['SECRET_KEY'] = 'test_secret_key'
-        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_ENABLED'] = True
         app.testing = True
         self.client = app.test_client()
         self.app_context = app.test_request_context()
