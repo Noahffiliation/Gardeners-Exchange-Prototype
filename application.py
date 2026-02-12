@@ -14,13 +14,7 @@ import db
 
 app = Flask(__name__)
 
-# Security: define secret key for session and CSRF protection
-load_dotenv()
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-if not app.config['SECRET_KEY']:
-    raise ValueError("No SECRET_KEY set for Flask application")
 csrf = CSRFProtect(app)
-
 
 @app.before_request
 def before_request():
