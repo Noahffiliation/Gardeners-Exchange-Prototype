@@ -1,0 +1,8 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "noahffiliation",
+        "projectKey": "Noahffiliation_Gardeners-Exchange-Prototype"
+    },
+    "snyk.advanced.organization": "2cc8ceda-5f53-4217-9760-3232809d9874",
+    "snyk.advanced.autoSelectOrganization": true
+}
