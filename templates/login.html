@@ -3,56 +3,56 @@
 {% block title %}Log In{% endblock %}
 
 {% macro wtfield(field) %}
-<p>
-    {{ field.label }} {{ field() }}
-    {% if field.errors %}
-    {% for error in field.errors %}
-    {{ error }}
-    {% endfor %}
+    <p>
+        {{ field.label }} {{ field() }}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                {{ error }}
+            {% endfor %}
 
-    {% endif %}
-</p>
+        {% endif %}
+    </p>
 {% endmacro %}
 
 {% block content %}
-<div class="row justify-content-md-center" style="padding-top:10%">
-    <h1 style="font-size: 30px;">Log In</h1>
-</div>
-<div class="container row justify-content-md-center" style="padding-top:5%">
-    <form method="POST">
-        {{ form.hidden_tag() }}
-
-        <div class="row justify-content-center" ;>
-
-            <br>
-            {{ wtfield(form.email) }}
+        <div class="row justify-content-md-center" style="padding-top:10%">
+            <h1 style="font-size: 30x;">Log In</h1>
         </div>
-        <div class="row justify-content-right">
+        <div class="container row justify-content-md-center" style="padding-top:5%">
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
+                <div class="row justify-content-center";>
+                    <h1 style="font-size: 22px"></h1>
+                    <br>
+                    {{ wtfield(form.email) }}
+                </div>
+                <div class="row justify-content-right">
+                    <h1 style="font-size: 22px;"></h1>
+                </div>
+                <div class="row justify-content-center">
+                    <!--style this button please-->
+                    {{ wtfield(form.password) }}
+                </div>
+                <div class="row justify-content-right">
+                    <h1 style="font-size: 22px;"></h1>
+                </div>
+                <div class="row justify-content-center">
+                    <!--style this button please-->
+                    {{ form.submit(class_="box-sizing:14pt") }}
+                </div>
+                <div class="row justify-content-right">
+                    <h1 style="font-size: 22px;"></h1>
+                </div>
+                <div id="loginbutton" class="row justify-content-md-center">
+                   &nbsp <p style="margin-left: 5px";></p>
+                </div>
+            </form>
         </div>
-        <div class="row justify-content-center">
-            <!--style this button please-->
-            {{ wtfield(form.password) }}
-        </div>
-        <div class="row justify-content-right">
 
-        </div>
-        <div class="row justify-content-center">
-            <!--style this button please-->
-            {{ form.submit(class_="box-sizing:14pt") }}
-        </div>
-        <div class="row justify-content-right">
 
+         <div class="row justify-content-md-center">
+            &nbsp&nbspDon't have an account?&nbsp<a href="{{ url_for('create_account') }}">
+    Register here!</a>
         </div>
-        <div id="loginbutton" class="row justify-content-md-center">
-            &nbsp <p style="margin-left: 5px" ;></p>
-        </div>
-    </form>
-</div>
-
-
-<div class="row justify-content-md-center">
-    &nbsp&nbspDon't have an account?&nbsp<a href="{{ url_for('create_account') }}">
-        Register here!</a>
-</div>
 {% endblock %}

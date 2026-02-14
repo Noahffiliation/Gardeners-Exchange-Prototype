@@ -1,10 +1,10 @@
 -- CAUTION!! WILL REMOVE ALL DATA FROM DB. USE WITH CARE
 
-DELETE FROM message WHERE 1=1;
-DELETE FROM photo WHERE 1=1;
-DELETE FROM listing_tag WHERE 1=1;
-DELETE FROM tag WHERE 1=1;
-DELETE FROM account_favorites WHERE 1=1;
-DELETE FROM transaction WHERE 1=1;
-DELETE FROM listing WHERE 1=1;
-DELETE FROM account WHERE 1=1;
+DELETE FROM message;
+DELETE FROM photo;
+DELETE FROM listing_tag;
+DELETE FROM tag;
+DELETE FROM account_favorites;
+DELETE FROM transaction;
+DELETE FROM listing;
+DELETE FROM account;

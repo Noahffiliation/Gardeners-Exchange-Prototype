@@ -1,20 +1,18 @@
 import os
 from pathlib import PurePath
-from dotenv import load_dotenv
 
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
-from flask_wtf.csrf import CSRFProtect
-from flask_wtf.file import FileField
-from wtforms import StringField, SubmitField, SelectField, FloatField, PasswordField, TextAreaField, IntegerField
+from flask_wtf.file import FileField, FileRequired
+from wtforms import StringField, SubmitField, SelectField, FloatField, PasswordField, ValidationError, TextAreaField, IntegerField
 from wtforms.validators import Email, Length, DataRequired, NumberRange, InputRequired, EqualTo, Optional
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, AnonymousUserMixin
 
 import db
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'Bagel Boiz Bun Roasting Bonanza'
 
-csrf = CSRFProtect(app)
 
 @app.before_request
 def before_request():
@@ -74,14 +72,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log In')
 
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    return render_template('login.html', form=form, hacker_news=db.all_accounts())
-
-
-@app.route('/login', methods=['POST'])
-def login_post():
     form = LoginForm()
     if form.validate_on_submit():
         if authenticate(form.email.data, form.password.data):
@@ -94,7 +86,7 @@ def login_post():
     return render_template('login.html', form=form, hacker_news=db.all_accounts())
 
 
-@app.route('/logout', methods=['GET'])
+@app.route('/logout')
 @login_required
 def logout():
     logout_user()
@@ -103,30 +95,30 @@ def logout():
 
 
 # Routes site to Main index page
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
     return redirect(url_for('render_feed'))
 
 
 # Routes to a testing page
-@app.route('/testing', methods=['GET'])
+@app.route('/testing')
 def testing():
     return render_template('testing.html')
 
 
-@app.route('/all_accounts', methods=['GET'])
+@app.route('/all_accounts')
 def all_accounts():
     # print(db.all_accounts())
     return render_template('all-accounts.html', accounts=db.all_accounts())
 
 
-@app.route('/about', methods=['GET'])
+@app.route('/about')
 def about():
     # print(db.all_accounts())
     return render_template('about.html', accounts=db.all_accounts())
 
 
-@app.route('/find_account/<email>', methods=['GET'])
+@app.route('/find_account/<email>')
 def find_account(email):
     account = db.find_account(email)
 
@@ -172,14 +164,8 @@ class BuyForm(FlaskForm):
     buy = SubmitField('Buy!')
 
 
-@app.route('/all_accounts/create', methods=['GET'])
+@app.route('/all_accounts/create', methods=['GET', 'POST'])
 def create_account():
-    account_form = AccountForm()
-    return render_template('account-form.html', form=account_form, mode='create')
-
-
-@app.route('/all_accounts/create', methods=['POST'])
-def create_account_post():
     account_form = AccountForm()
 
     if account_form.validate_on_submit():
@@ -203,7 +189,7 @@ def create_account_post():
     return render_template('account-form.html', form=account_form, mode='create')
 
 
-@app.route('/all_accounts/update/<email>', methods=['GET'])
+@app.route('/all_accounts/update/<email>', methods=['GET', 'POST'])
 @login_required
 def update_account(email):
     row = db.find_account(email)
@@ -216,37 +202,6 @@ def update_account(email):
                                first_name=row['first_name'],
                                last_name=row['last_name'],
                                bio=row['bio'])
-    return render_template('account-form.html', form=account_form, mode='update')
-
-
-@app.route('/all_accounts/update/<email>', methods=['POST'])
-@login_required
-def update_account_post(email):
-    # Fetch row again for consistency or if needed for validation context,
-    # though technically form data is what matters for update.
-    # However, original code fetched it to populate form.
-    # We might need it if validation fails to re-populate?
-    # Actually validation fails re-renders template with form data.
-    # But we need basic checks?
-    row = db.find_account(email)
-    if row is None:
-        flash("Member {} doesn't exist".format(email))
-        return redirect(url_for('all_accounts'))
-
-    account_form = AccountForm(email=row['email'],
-                               first_name=row['first_name'],
-                               last_name=row['last_name'],
-                               bio=row['bio'])
-
-    # Override with POST data? Flask-WTF does this automatically if request.method is POST
-    # But we re-instantiated it above.
-    # Actually `AccountForm()` attempts to load from request.form if available.
-    # But we passed kwargs.
-    # Wait, if we pass kwargs, does it ignore request.form?
-    # "If formdata is not None, it is used... If formdata is None, it will be pulled from request.form"
-    # "obj / kwargs ... are used to populate the form ... only if formdata is empty"
-    # So `AccountForm(...)` with kwargs will use kwargs as defaults but request.form takes precedence if present.
-    # So the logic is fine.
 
     if account_form.validate_on_submit():
         rowcount = db.update_account(email,
@@ -263,16 +218,9 @@ def update_account_post(email):
     return render_template('account-form.html', form=account_form, mode='update')
 
 
-@app.route('/all_listings/create', methods=['GET'])
+@app.route('/all_listings/create', methods=['GET', 'POST'])
 @login_required
 def create_listing():
-    listing_form = ListingForm()
-    return render_template('listing_form.html', form=listing_form, mode='create')
-
-
-@app.route('/all_listings/create', methods=['POST'])
-@login_required
-def create_listing_post():
     listing_form = ListingForm()
 
     if listing_form.submit():
@@ -287,7 +235,7 @@ def create_listing_post():
                                            current_user.email,
                                            listing_form.unit.data)
 
-            if listing_id != 0:
+            if listing_id is not 0:
                 if listing_form.photo.data is not None:
                     uploaded_photo = listing_form.photo.data
 
@@ -316,26 +264,9 @@ def create_listing_post():
     return render_template('listing_form.html', form=listing_form, mode='create')
 
 
-@app.route('/all_listings/update/<id>', methods=['GET'])
+@app.route('/all_listings/update/<id>', methods=['GET', 'POST'])
 @login_required
 def update_listing(id):
-    row = db.find_listing(id)
-
-    if row is None:
-        flash("Listing {} doesn't exist".format(id))
-        return redirect(url_for('all_listings'))
-
-    listing_form = ListingForm(name=row['name'],
-                               quantity=row['quantity'],
-                               description=row['description'],
-                               price=row['price'],
-                               unit=row['unit'])
-    return render_template('listing_form.html', form=listing_form)
-
-
-@app.route('/all_listings/update/<id>', methods=['POST'])
-@login_required
-def update_listing_post(id):
     row = db.find_listing(id)
 
     if row is None:
@@ -384,22 +315,21 @@ def update_listing_post(id):
 @app.route('/feed/buy/<listing_id>/<amount>', methods=['POST'])
 @login_required
 def buy_listing(listing_id, amount):
-    if float(amount) <= db.find_listing(listing_id)['quantity']:
-        db.buy_listing(listing_id, float(amount))
-        flash("You bought {} {} of {}".format(amount, db.find_listing(listing_id)['unit'], db.find_listing(listing_id)['name']))
+    if amount <= db.find_listing(listing_id)['quantity']:
+        rowcount = db.buy_listing(listing_id, amount)
+        flash("You bought {} {} of {}".format('amount', db.find_listing(listing_id)['unit'], db.find_listing(listing_id)['name']))
     else:
         flash('Invalid amount')
-    return redirect(url_for('render_feed'))
+    return render_template(url_for('render_feed'))
 
 
 # Render 'feed' as homepage
-@app.route('/feed', methods=['GET'])
+@app.route('/feed')
 def render_feed():
     buy_form = BuyForm()
-    # Logic for POST (form validation) removed as this is a GET-only route.
-    # The Buy button handling should be in a separate POST route or the form attached to a specific action.
-    # Currently buy_listing is at /feed/buy/<listing_id>/<amount> which is a POST route.
-    # This renders the feed.
+    if buy_form.validate_on_submit():
+        print("IM TRYING")
+        return render_template(url_for('buy_listing', listing_id=buy_form.id.data, amount=buy_form.amount.data))
     db.check_expire_all()
     num_items = 100
     if current_user:
@@ -409,7 +339,7 @@ def render_feed():
 
 
 # View Message
-@app.route('/view_message', methods=['GET'])
+@app.route('/view_message')
 def render_message():
 
     messages = db.fetch_messages(me, you)
@@ -422,7 +352,7 @@ def mark_favorite():
     return "OK"
 
 
-@app.route('/favorites/<email>', methods=['GET'])
+@app.route('/favorites/<email>')
 @login_required
 def favorites(email):
     account = db.find_account(email)
@@ -435,4 +365,4 @@ def favorites(email):
 
 # Make this the last line in the file!
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

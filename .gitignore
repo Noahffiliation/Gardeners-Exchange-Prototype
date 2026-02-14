@@ -1,6 +1,6 @@
 db_config.py
 ./static/photos/*
 .idea/
-.venv/
+venv/
 *.xml
-__pycache__/
+

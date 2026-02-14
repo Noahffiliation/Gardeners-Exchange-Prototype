@@ -13,7 +13,7 @@ This application was developed as part of the Information Systems Design class a
 ## Configuration Instructions
 
 Setup Database Configuration
-1. Create a file named "db_config.py". _DO NOT COMMIT THIS FILE_ 
+1. Create a file named "db_config.py". _DO NOT COMMIT THIS FILE_
 2. On one line write: data_source_name = 'YOUR DATABASE CONFIG STUFF HERE'
    Example: data_source_name = 'host=faraday.cse.taylor.edu dbname=dunky user=brungus password=batmen'
 3. Once the db_config.py file is created, connect as PostgreSQL database and run the create_db.sql file.
